@@ -4,10 +4,11 @@ const dotenv = require('dotenv');
 dotenv.config();
 const cors = require('cors');
 app.use(cors());
-
+const connectToDb = require('./db/db');    
+connectToDb();
 app.get('/', (req, res) => {
               res.send('Hello World!');
 });
 
 
-module.exports = app;
+module.exports = app; 
