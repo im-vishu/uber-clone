@@ -1,180 +1,350 @@
-# 📌 User Registration API
+# 🚗 Ride-Hailing Backend API
 
-## POST `/user/register`
-
-Registers a new user and returns an authentication token.
-
-This endpoint validates user input, hashes the password, creates a new user record, and generates a JWT token for authentication.
+A RESTful backend API for a ride-hailing application built with Node.js, Express, MongoDB, and JWT authentication. Supports two user types: **Users** (riders) and **Captains** (drivers).
 
 ---
 
-## 🧾 Description
+## 📋 Table of Contents
 
-The registration endpoint allows new users to create an account.
-
-### What happens when this endpoint is called:
-
-1. Request body is validated.
-2. Password is hashed securely.
-3. User is saved in the database.
-4. JWT authentication token is generated.
-5. Token & user details are returned.
-
----
-
-## 📥 Request
-
-### Content-Type
-
-application/json
-
-### Required Fields
-
-| Field     | Type   | Required | Description                          |
-|-----------|--------|----------|--------------------------------------|
-| firstname | string | ✅       | First name (minimum 3 characters)    |
-| lastname  | string | ✅       | Last name (minimum 3 characters)     |
-| email     | string | ✅       | Valid email address (must be unique) |
-| password  | string | ✅       | Password (minimum 6 characters)      |
+- [Tech Stack](#tech-stack)
+- [Project Structure](#project-structure)
+- [Getting Started](#getting-started)
+- [Environment Variables](#environment-variables)
+- [API Reference](#api-reference)
+  - [User Endpoints](#user-endpoints)
+  - [Captain Endpoints](#captain-endpoints)
+- [Authentication](#authentication)
+- [Error Handling](#error-handling)
+- [Known Issues & Bugs](#known-issues--bugs)
 
 ---
 
-## 🧪 Example Request
+## 🛠 Tech Stack
 
+| Technology | Purpose |
+|---|---|
+| Node.js | Runtime environment |
+| Express.js v5 | Web framework |
+| MongoDB + Mongoose | Database & ODM |
+| bcrypt / bcryptjs | Password hashing |
+| JSON Web Token (JWT) | Authentication |
+| express-validator | Request validation |
+| cookie-parser | Cookie handling |
+| cors | Cross-Origin Resource Sharing |
+| dotenv | Environment variable management |
+
+---
+
+## 📁 Project Structure
+
+```
+backend/
+├── controllers/
+│   ├── user.controller.js       # User business logic
+│   └── captain.controller.js    # Captain business logic
+├── db/
+│   └── db.js                    # MongoDB connection
+├── middlewares/
+│   └── auth.middleware.js       # JWT auth guards
+├── models/
+│   ├── user.model.js            # User schema
+│   ├── captain.model.js         # Captain schema
+│   └── blacklistToken.model.js  # Token blacklist (logout)
+├── routes/
+│   ├── user.routes.js           # User route definitions
+│   └── captain.routes.js        # Captain route definitions
+├── services/
+│   ├── user.service.js          # User DB operations
+│   └── captain.service.js       # Captain DB operations
+├── app.js                       # Express app setup
+├── server.js                    # HTTP server entry point
+└── package.json
+```
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js >= 18
+- MongoDB instance (local or Atlas)
+
+### Installation
+
+```bash
+# Clone the repository
+git clone <your-repo-url>
+cd backend
+
+# Install dependencies
+npm install
+
+# Create environment file
+cp .env.example .env
+# Fill in your values (see Environment Variables section)
+
+# Start the server
+node server.js
+```
+
+The server runs on `http://localhost:4000` by default.
+
+---
+
+## 🔐 Environment Variables
+
+Create a `.env` file in the `backend/` root:
+
+```env
+PORT=4000
+DB_CONNECT=mongodb://localhost:27017/ridehailing
+JWT_SECRET=your_super_secret_jwt_key
+NODE_ENV=development
+```
+
+---
+
+## 📡 API Reference
+
+### User Endpoints
+
+#### `POST /users/register`
+
+Register a new user account.
+
+**Request Body:**
 ```json
 {
-  "firstname": "Vishu",
-  "lastname": "Kumar",
-  "email": "vishu@example.com",
-  "password": "securePass123"
+  "fullname": {
+    "firstname": "John",
+    "lastname": "Doe"
+  },
+  "email": "john@example.com",
+  "password": "secret123"
 }
-📤 Success Response
-✅ 201 Created
+```
+
+**Validation Rules:**
+- `fullname.firstname` — minimum 3 characters
+- `fullname.lastname` — minimum 3 characters
+- `email` — must be a valid email address
+- `password` — minimum 6 characters
+
+**Success Response `201`:**
+```json
 {
-  "token": "JWT_TOKEN_HERE",
-  "user": {
-    "_id": "65e8abc123",
-    "fullname": {
-      "firstname": "Vishu",
-      "lastname": "Kumar"
-    },
-    "email": "vishu@example.com"
-  }
+  "user": { "_id": "...", "fullname": { "firstname": "John", "lastname": "Doe" }, "email": "john@example.com" },
+  "token": "<JWT_TOKEN>"
 }
-❌ Error Responses
-🔴 400 Bad Request — Validation Error
-
-Returned when required fields are missing or invalid.
-
-{
-  "errors": [
-    {
-      "msg": "Invalid email address",
-      "param": "email"
-    }
-  ]
-}
-
-Possible validation errors:
-
-Invalid email format
-
-First name less than 3 characters
-
-Password less than 6 characters
-
-🔴 500 Internal Server Error
-
-Returned if server or database fails.
-
-{
-  "message": "Internal Server Error"
-}
-🔐 Security Notes
-
-Passwords are hashed using bcrypt before storage.
-
-JWT token is generated for authentication.
-
-Password field is never returned in the response.
-
-Always use HTTPS in production.
-
-⚠️ Important Notes
-
-✔ Email must be unique
-✔ Password is securely encrypted
-✔ Store the token securely on the client side
-✔ Use HTTPS in production
-
-📦 Endpoint Summary
-Method	Endpoint	Description
-POST	/user/register	Register a new user
-🛠 Tech Stack
-
-Node.js
-
-Express.js
-
-MongoDB
-
-Mongoose
-
-bcrypt
-
-JSON Web Token (JWT)
-
-express-validator
-
-📁 Example Project Structure
-project-root/
-│
-├── routes/
-│   └── user.routes.js
-├── controllers/
-│   └── user.controller.js
-├── models/
-│   └── user.model.js
-├── services/
-│   └── user.service.js
-└── app.js
-🚀 Usage
-
-Send a POST request to:
-
-http://localhost:PORT/user/register
-
-Using tools like:
-
-Postman
-
-Thunder Client
-
-curl
-
-frontend application
-
-🧪 Testing with curl
-curl -X POST http://localhost:3000/user/register \
--H "Content-Type: application/json" \
--d '{
-  "firstname":"Vishant",
-  "lastname":"Chaudhary",
-  "email":"vishantchoudhary2003@gmail.com",
-  "password":"securePass123"
-}'
-👨‍💻 Author
-
-Built for learning and production-ready authentication systems.
-
+```
 
 ---
 
-If you want, I can next:
+#### `POST /users/login`
 
-✅ Create **login endpoint README**  
-✅ Generate **Swagger docs**  
-✅ Review your code for bugs & improvements  
-✅ Help you deploy this API  
+Authenticate an existing user.
 
-Just tell me 👍
+**Request Body:**
+```json
+{
+  "email": "john@example.com",
+  "password": "secret123"
+}
+```
+
+**Success Response `200`:**
+```json
+{
+  "user": { ... },
+  "token": "<JWT_TOKEN>"
+}
+```
+
+Sets an `httpOnly` cookie named `token` (expires in 24 hours).
+
+---
+
+#### `GET /users/profile`
+
+Get the authenticated user's profile. **Requires authentication.**
+
+**Headers:**
+```
+Authorization: Bearer <JWT_TOKEN>
+```
+
+**Success Response `200`:**
+```json
+{
+  "user": { "_id": "...", "fullname": { ... }, "email": "..." }
+}
+```
+
+---
+
+#### `GET /users/logout`
+
+Log out the current user and blacklist the token. **Requires authentication.**
+
+**Success Response `200`:**
+```json
+{ "message": "Logged out successfully" }
+```
+
+---
+
+### Captain Endpoints
+
+#### `POST /captains/register`
+
+Register a new captain (driver) account.
+
+**Request Body:**
+```json
+{
+  "fullname": {
+    "firstname": "Jane",
+    "lastname": "Driver"
+  },
+  "email": "jane@example.com",
+  "password": "secret123",
+  "vehicle": {
+    "color": "Black",
+    "plate": "AB1234",
+    "capacity": 4,
+    "vehicleType": "car"
+  }
+}
+```
+
+**Validation Rules:**
+- `fullname.firstname` — minimum 3 characters
+- `fullname.lastname` — minimum 3 characters
+- `email` — must be a valid email address
+- `password` — minimum 6 characters
+- `vehicle.color` — required
+- `vehicle.plate` — required, must be unique
+- `vehicle.capacity` — required, minimum 1
+- `vehicle.vehicleType` — must be `car`, `motorcycle`, or `auto`
+
+**Success Response `201`:**
+```json
+{
+  "captain": { "_id": "...", "fullname": { ... }, "email": "...", "vehicle": { ... } },
+  "token": "<JWT_TOKEN>"
+}
+```
+
+---
+
+#### `POST /captains/login`
+
+Authenticate an existing captain.
+
+**Request Body:**
+```json
+{
+  "email": "jane@example.com",
+  "password": "secret123"
+}
+```
+
+**Success Response `200`:**
+```json
+{
+  "captain": { ... },
+  "token": "<JWT_TOKEN>"
+}
+```
+
+Sets a `token` cookie on the response.
+
+---
+
+#### `GET /captains/profile`
+
+Get the authenticated captain's profile. **Requires authentication.**
+
+**Success Response `200`:**
+```json
+{
+  "captain": { "_id": "...", "fullname": { ... }, "email": "...", "vehicle": { ... }, "status": "offline" }
+}
+```
+
+---
+
+#### `GET /captains/logout`
+
+Log out the captain and blacklist the token. **Requires authentication.**
+
+**Success Response `200`:**
+```json
+{ "message": "Logged out successfully" }
+```
+
+---
+
+## 🔒 Authentication
+
+All protected routes require a valid JWT token, passed either as:
+
+- **Cookie:** `token=<JWT_TOKEN>`
+- **Header:** `Authorization: Bearer <JWT_TOKEN>`
+
+Tokens expire after **24 hours**. Logged-out tokens are stored in a blacklist collection (auto-deleted after 24h via MongoDB TTL index).
+
+---
+
+## ❌ Error Handling
+
+**Validation Error `400`:**
+```json
+{
+  "errors": [
+    { "msg": "Please provide a valid email address", "param": "email" }
+  ]
+}
+```
+
+**Duplicate User/Captain `400`:**
+```json
+{ "message": "User already exists" }
+```
+
+**Unauthorized `401`:**
+```json
+{ "message": "Invalid email or password" }
+```
+
+**Invalid/Missing Token `401`:**
+```json
+{ "message": "No token provided, authorization denied" }
+```
+
+---
+
+## ⚠️ Known Issues & Bugs
+
+The following bugs exist in the current codebase and should be fixed before production use:
+
+1. **`app.js` — Middleware order:** `express.json()` and `express.urlencoded()` are registered *after* the user routes, meaning the `/users` endpoints cannot parse JSON request bodies. Move these lines to before any route registration.
+
+2. **`user.model.js` — `comparePassword` binding:** `userSchema.comparePassword` is assigned directly on the schema object instead of `userSchema.methods.comparePassword`, so it won't be available on model instances.
+
+3. **`user.service.js` — `new` keyword on `.create()`:** `new userModel.create(...)` is invalid. Use `userModel.create(...)` directly (no `new`). Also `new error(...)` should be `new Error(...)`.
+
+4. **`captain.model.js` — Typo:** `constSchema.methods.comparePassword` should be `captainSchema.methods.comparePassword`.
+
+5. **`captain.model.js` — `generateAuthToken` signature mismatch:** The method uses `this._id` but the controller calls `captainModel.generateToken(captain._id)` as a static. These need to be aligned.
+
+6. **`captain.model.js` — Missing `location` defaults:** The `location` field (`lat`, `lng`) is marked `required: true` but no default is provided, causing captain registration to fail unless coordinates are supplied.
+
+7. **`blacklistToken.model.js` — `userId` required but never set:** The logout controllers don't pass a `userId` when creating blacklist records, causing logout to fail due to schema validation.
+
+---
+
+## 👨‍💻 Author
+
+Built for learning production-ready authentication systems with Node.js and Express.
