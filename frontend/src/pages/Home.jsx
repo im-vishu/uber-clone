@@ -1,18 +1,11 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import React from "react";
 
 const Home = () => {
   return (
-    <div>
-      <div className=' bg-cover bg-center bg-[url(https://images.unsplash.com/photo-1557404763-69708cd8b9ce?q=80&w=764&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)] h-screen pt-8 flex justify-between flex-col w-full '>
-              <img className='w-16 ml-8'  src="https://imgs.search.brave.com/s5zvkbY9IR_KK_s8AdtUeMlDVGu_g341wSpOnBIWPAc/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pbWcu/ZmF2cG5nLmNvbS8x/NC81LzkvdWJlci1s/b2dvLXViZXItbG9n/by1kWGcydUZuZ190/LmpwZw" alt="" />
-              <div className='bg-white pb-7 py-4 px-4'>
-              <h2 className='text-3xl font-bold'>Get Started with Uber</h2>
-              <Link to='/login' className='flex items-center justify-center w-full bg-black text-white py-3 rounded mt-5'>Continue</Link>
+    <div>     
+              <h1 className="text-3xl font-bold">Welcome to Uber Clone</h1>
               </div>
-      </div>
-    </div>
-  )
-}
+  );
+};             
 
-export default Home
+export default Home         
